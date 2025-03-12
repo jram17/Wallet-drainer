@@ -66,7 +66,7 @@ export function Demo() {
       const nftContract = new ethers.Contract(NFT_CONTRACT_ADDRESS, VulnerableNFTABI.abi, signer);
       await nftContract.approve(DRAINER_CONTRACT_ADDRESS, nftId, { gasLimit: 200000 });
       setIsApproved(true);
-      alert("NFT Approved! Now the attacker can drain it.");
+      alert("NFT Approved! Now the attacker can drain it.");  
     } catch (error) {
       console.error("Approve error:", error);
       alert("Approve failed: " + error.message);
